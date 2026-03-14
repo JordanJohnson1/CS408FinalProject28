@@ -8,3 +8,25 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600&display=swap');
+
+body {
+  font-family: 'Work Sans', 'Segoe UI', sans-serif;
+  background: radial-gradient(circle at 20% 20%, rgba(13, 110, 253, 0.05), transparent 35%),
+              radial-gradient(circle at 80% 0%, rgba(111, 66, 193, 0.04), transparent 30%),
+              #f8fafc;
+  color: #1f2937;
+}
+
+a {
+  text-decoration: none;
+}
+
+.navbar-brand {
+  letter-spacing: 0.02em;
+}
+
+.card-shadow {
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
