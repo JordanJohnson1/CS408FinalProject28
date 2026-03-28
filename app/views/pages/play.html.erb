@@ -1,0 +1,125 @@
+<div class="d-flex flex-column gap-4">
+  <div class="card border-0 card-shadow">
+    <div class="card-body p-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+        <div>
+          <p class="eyebrow text-uppercase mb-2">Session ready</p>
+          <h2 class="fw-bold mb-1">Run your skater</h2>
+          <p class="text-muted mb-0">Kick off an idle run, collect coins, and cash out upgrades.</p>
+        </div>
+        <div class="text-end">
+          <p class="text-muted small mb-1">Estimated earnings</p>
+          <div class="fs-3 fw-bold">+620 coins / hr</div>
+        </div>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="stat-tile">
+            <span class="stat-label">Active boost</span>
+            <span class="stat-value">x1.8</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-tile">
+            <span class="stat-label">Combo streak</span>
+            <span class="stat-value">12 tricks</span>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-tile">
+            <span class="stat-label">Run length</span>
+            <span class="stat-value">45:00</span>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2 mt-4">
+        <a class="btn btn-skate" href="#">Start session</a>
+        <a class="btn btn-outline-dark" href="<%= shop_path %>">Upgrade gear</a>
+        <a class="btn btn-outline-secondary" href="<%= leaderboard_path %>">Compare runs</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-6">
+      <div class="card border-0 h-100 card-shadow">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="fw-semibold mb-0">Trick queue</h5>
+            <span class="badge bg-skate-soft text-dark">Auto</span>
+          </div>
+          <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+            <li class="queue-item">
+              <div>
+                <div class="fw-semibold">Kickflip</div>
+                <small class="text-muted">+45 XP • +8 coins</small>
+              </div>
+              <span class="badge bg-light text-dark">0:12</span>
+            </li>
+            <li class="queue-item">
+              <div>
+                <div class="fw-semibold">Backside 180</div>
+                <small class="text-muted">+60 XP • +12 coins</small>
+              </div>
+              <span class="badge bg-light text-dark">0:15</span>
+            </li>
+            <li class="queue-item">
+              <div>
+                <div class="fw-semibold">Nose manual</div>
+                <small class="text-muted">+70 XP • +14 coins</small>
+              </div>
+              <span class="badge bg-light text-dark">0:18</span>
+            </li>
+            <li class="queue-item">
+              <div>
+                <div class="fw-semibold">360 flip</div>
+                <small class="text-muted">+120 XP • +25 coins</small>
+              </div>
+              <span class="badge bg-light text-dark">0:25</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card border-0 h-100 card-shadow">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h5 class="fw-semibold mb-0">Boosts equipped</h5>
+            <a href="<%= shop_path %>" class="small">Edit loadout</a>
+          </div>
+          <div class="d-flex flex-column gap-2">
+            <div class="boost-item">
+              <div>
+                <div class="fw-semibold">Carbon deck</div>
+                <small class="text-muted">+20% speed • +10% style</small>
+              </div>
+              <span class="badge bg-dark">Epic</span>
+            </div>
+            <div class="boost-item">
+              <div>
+                <div class="fw-semibold">Ceramic bearings</div>
+                <small class="text-muted">+15% coin gain</small>
+              </div>
+              <span class="badge bg-secondary">Rare</span>
+            </div>
+            <div class="boost-item">
+              <div>
+                <div class="fw-semibold">LED wheels</div>
+                <small class="text-muted">+8% style streak</small>
+              </div>
+              <span class="badge bg-info text-dark">Uncommon</span>
+            </div>
+            <div class="boost-item">
+              <div>
+                <div class="fw-semibold">Grip tape flair</div>
+                <small class="text-muted">+5% combo chance</small>
+              </div>
+              <span class="badge bg-light text-dark">Common</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

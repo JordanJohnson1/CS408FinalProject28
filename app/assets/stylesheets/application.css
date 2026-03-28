@@ -9,24 +9,121 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Work+Sans:wght@400;600&display=swap');
+
+:root {
+  --skate-dark: #0f172a;
+  --skate-ink: #111827;
+  --skate-glow: #22d3ee;
+  --skate-orange: #fb923c;
+  --skate-bg: #f6f7fb;
+  --skate-card: #ffffff;
+}
 
 body {
   font-family: 'Work Sans', 'Segoe UI', sans-serif;
-  background: radial-gradient(circle at 20% 20%, rgba(13, 110, 253, 0.05), transparent 35%),
-              radial-gradient(circle at 80% 0%, rgba(111, 66, 193, 0.04), transparent 30%),
-              #f8fafc;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(34, 211, 238, 0.08), transparent 38%),
+    radial-gradient(circle at 82% 8%, rgba(251, 146, 60, 0.07), transparent 32%),
+    var(--skate-bg);
   color: #1f2937;
 }
 
-a {
-  text-decoration: none;
+h1, h2, h3, .navbar-brand {
+  font-family: 'Space Grotesk', 'Work Sans', 'Segoe UI', sans-serif;
+  letter-spacing: -0.01em;
 }
 
-.navbar-brand {
-  letter-spacing: 0.02em;
+a { text-decoration: none; }
+
+.navbar.nav-glass {
+  background: linear-gradient(135deg, var(--skate-ink), #0b1221);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.card-shadow {
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+.navbar-brand { letter-spacing: 0.04em; }
+
+.nav-link { color: rgba(255, 255, 255, 0.8); }
+.nav-link.active, .nav-link:focus, .nav-link:hover { color: #fff; }
+
+.card-shadow { box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08); }
+
+.hero {
+  background: linear-gradient(135deg, #0b1221 0%, #111827 55%, #162134 100%);
+  color: #f8fafc;
 }
+
+.hero-shape {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 70% 30%, rgba(34, 211, 238, 0.15), transparent 35%),
+              radial-gradient(circle at 25% 75%, rgba(251, 146, 60, 0.14), transparent 32%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.eyebrow {
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 1rem;
+  backdrop-filter: blur(6px);
+}
+
+.stat-tile {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.9rem;
+  padding: 0.85rem 1rem;
+  background: #fff;
+}
+
+.stat-label { display: block; font-size: 0.8rem; color: #6b7280; }
+.stat-value { font-weight: 700; font-size: 1.25rem; color: var(--skate-ink); }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  background: #f3f4f6;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.pill-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.bg-skate { background-color: var(--skate-glow) !important; }
+.bg-skate-soft { background-color: rgba(34, 211, 238, 0.16) !important; }
+
+.btn-skate {
+  background: linear-gradient(135deg, var(--skate-glow), #0ea5e9);
+  color: #0f172a;
+  border: none;
+  font-weight: 700;
+}
+
+.btn-skate:hover { color: #0f172a; filter: brightness(0.95); }
+
+.queue-item, .boost-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.8rem;
+  background: #fff;
+}
+
+.progress-stack .progress { height: 0.6rem; border-radius: 999px; }
+.progress-label { font-weight: 600; color: #4b5563; font-size: 0.9rem; }

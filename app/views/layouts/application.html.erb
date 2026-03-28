@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Hello World App" %></title>
+    <title><%= content_for(:title) || "Stick Skater" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Hello World App">
+    <meta name="application-name" content="Stick Skater">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -27,16 +27,25 @@
   </head>
 
   <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark nav-glass">
       <div class="container">
-        <a class="navbar-brand fw-semibold" href="<%= root_path %>">Hello World</a>
+        <a class="navbar-brand fw-semibold" href="<%= root_path %>">Stick Skater</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarMain">
-          <ul class="navbar-nav ms-auto">
+          <ul class="navbar-nav ms-auto gap-lg-1">
             <li class="nav-item">
-              <a class="nav-link <%= current_page?(root_path) ? "active" : "" %>" href="<%= root_path %>">Home</a>
+              <a class="nav-link <%= current_page?(root_path) ? "active" : "" %>" href="<%= root_path %>">Landing</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link <%= current_page?(play_path) ? "active" : "" %>" href="<%= play_path %>">Play</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link <%= current_page?(shop_path) ? "active" : "" %>" href="<%= shop_path %>">Shop</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link <%= current_page?(leaderboard_path) ? "active" : "" %>" href="<%= leaderboard_path %>">Leaderboard</a>
             </li>
           </ul>
         </div>
@@ -52,8 +61,8 @@
 
     <footer class="bg-white border-top">
       <div class="container py-3 d-flex flex-column flex-md-row align-items-center gap-2 justify-content-between">
-        <span class="fw-semibold">Hello World App</span>
-        <span class="text-muted small">Powered by Ruby on Rails</span>
+        <span class="fw-semibold">Stick Skater</span>
+        <span class="text-muted small">Built for idle skate vibes</span>
       </div>
     </footer>
   </body>
