@@ -127,3 +127,24 @@ a { text-decoration: none; }
 
 .progress-stack .progress { height: 0.6rem; border-radius: 999px; }
 .progress-label { font-weight: 600; color: #4b5563; font-size: 0.9rem; }
+
+.key-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.65rem;
+  background: #111827;
+  color: #f8fafc;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.log-entry {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.7rem;
+  padding: 0.75rem 0.9rem;
+  background: #fff;
+}

@@ -50,6 +50,74 @@
   <div class="hero-shape"></div>
 </div>
 
+<div class="row g-3 mb-4">
+  <div class="col-lg-7">
+    <div class="card border-0 card-shadow h-100">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <p class="eyebrow text-uppercase mb-1 text-muted">Your skater</p>
+            <h3 class="fw-bold mb-0"><%= current_player ? current_player.name : "Create a skater" %></h3>
+          </div>
+          <% if current_player %>
+            <span class="badge rounded-pill" style="background:<%= current_player.avatar_color %>20; color:<%= current_player.avatar_color %>">Active</span>
+          <% end %>
+        </div>
+        <% if current_player %>
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="stat-tile">
+                <span class="stat-label">Coins</span>
+                <span class="stat-value"><%= current_player.coins %></span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-tile">
+                <span class="stat-label">XP</span>
+                <span class="stat-value"><%= current_player.xp %></span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-tile">
+                <span class="stat-label">Best combo</span>
+                <span class="stat-value"><%= current_player.best_combo %></span>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="stat-tile">
+                <span class="stat-label">Lifetime tricks</span>
+                <span class="stat-value"><%= current_player.total_tricks %></span>
+              </div>
+            </div>
+          </div>
+          <a class="btn btn-skate w-100 mt-3" href="<%= play_path %>">Jump into a run</a>
+        <% else %>
+          <p class="text-muted">Pick a name and color to start skating.</p>
+          <%= render "players/form" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card border-0 card-shadow h-100">
+      <div class="card-body p-4">
+        <p class="eyebrow text-uppercase mb-2 text-muted">Tricks available</p>
+        <ul class="list-unstyled mb-0 d-flex flex-column gap-2">
+          <% Trick.order(:difficulty, :name).limit(6).each do |trick| %>
+            <li class="queue-item">
+              <div>
+                <div class="fw-semibold"><%= trick.name %></div>
+                <small class="text-muted">Inputs: <%= trick.input_sequence %> • <%= trick.base_coins %> coins</small>
+              </div>
+              <span class="badge bg-light text-dark">Diff <%= trick.difficulty %></span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="row g-3 g-lg-4 mb-4">
   <div class="col-md-4">
     <div class="card h-100 card-shadow border-0">

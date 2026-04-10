@@ -25,26 +25,19 @@
                   <th scope="col">Player</th>
                   <th scope="col">Coins</th>
                   <th scope="col">Best combo</th>
-                  <th scope="col">Run time</th>
+                  <th scope="col">Lifetime tricks</th>
                 </tr>
               </thead>
               <tbody>
-                <% rows = [
-                  { rank: 1, name: "KickflipKid", coins: "142,500", combo: "48x", time: "05:12:40" },
-                  { rank: 2, name: "DeckLord", coins: "131,220", combo: "45x", time: "04:55:10" },
-                  { rank: 3, name: "ManualMage", coins: "118,040", combo: "41x", time: "04:22:58" },
-                  { rank: 4, name: "SwitchSavage", coins: "97,600", combo: "36x", time: "03:18:11" },
-                  { rank: 5, name: "Nosegrind", coins: "84,330", combo: "33x", time: "03:02:05" }
-                ] %>
-                <% rows.each do |row| %>
+                <% @top_players.each_with_index do |player, idx| %>
                   <tr>
                     <th scope="row">
-                      <span class="badge bg-dark"><%= row[:rank] %></span>
+                      <span class="badge bg-dark"><%= idx + 1 %></span>
                     </th>
-                    <td class="fw-semibold"><%= row[:name] %></td>
-                    <td><%= row[:coins] %></td>
-                    <td><%= row[:combo] %></td>
-                    <td><%= row[:time] %></td>
+                    <td class="fw-semibold"><%= player.name %></td>
+                    <td><%= number_with_delimiter(player.coins) %></td>
+                    <td><%= player.best_combo %>x</td>
+                    <td><%= player.total_tricks %></td>
                   </tr>
                 <% end %>
               </tbody>
@@ -60,20 +53,17 @@
             <h5 class="fw-semibold mb-0">Your position</h5>
             <span class="badge bg-skate-soft text-dark">Live</span>
           </div>
-          <div class="display-6 fw-bold">#182</div>
-          <p class="text-muted">StickSkaterYou • 24,900 coins • 18x combo</p>
-          <div class="d-flex gap-2 mb-3">
-            <span class="pill"><span class="pill-dot bg-dark"></span> +12 ranks today</span>
-            <span class="pill"><span class="pill-dot bg-warning"></span> Run bonus active</span>
-          </div>
-          <div class="progress-label d-flex justify-content-between mb-1">
-            <span>Next milestone</span>
-            <span>Top 150</span>
-          </div>
-          <div class="progress bg-light" role="progressbar" aria-label="Next milestone" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100">
-            <div class="progress-bar bg-skate" style="width: 72%"></div>
-          </div>
-          <a class="btn btn-dark mt-4" href="<%= play_path %>">Push a new run</a>
+          <% if current_player %>
+            <div class="display-6 fw-bold">You</div>
+            <p class="text-muted mb-2"><%= current_player.name %> • <%= number_with_delimiter(current_player.coins) %> coins • <%= current_player.best_combo %>x combo</p>
+            <div class="d-flex gap-2 mb-3">
+              <span class="pill"><span class="pill-dot bg-dark"></span> <%= current_player.total_tricks %> tricks</span>
+              <span class="pill"><span class="pill-dot bg-warning"></span> <%= current_player.total_coins_earned %> coins earned</span>
+            </div>
+          <% else %>
+            <p class="text-muted">Create a player to see your live stats.</p>
+          <% end %>
+          <a class="btn btn-dark mt-3" href="<%= play_path %>">Push a new run</a>
         </div>
       </div>
     </div>
