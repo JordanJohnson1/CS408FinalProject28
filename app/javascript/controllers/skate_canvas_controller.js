@@ -17,8 +17,9 @@ export default class extends Controller {
     this.trickState = null
     this.railSpacing = 520
     this.parallaxLayers = [
-      { color: "#111b37", height: 140, speed: 0.35, amplitude: 12 },
-      { color: "#0d1f44", height: 90, speed: 0.6, amplitude: 18 }
+      { color: "#132349", height: 140, speed: 0.35, amplitude: 12 },
+      { color: "#123456", height: 90, speed: 0.6, amplitude: 18 },
+      { color: "#0d9488", height: 60, speed: 0.9, amplitude: 10 }
     ]
     this.skaterX = this.width * 0.5
     this.animate = this.animate.bind(this)
@@ -59,24 +60,35 @@ export default class extends Controller {
 
   clear() {
     const gradient = this.ctx.createLinearGradient(0, 0, 0, this.height)
-    gradient.addColorStop(0, "#0b1327")
-    gradient.addColorStop(1, "#070a16")
+    gradient.addColorStop(0, "#0ea5e9")
+    gradient.addColorStop(0.4, "#1e1b4b")
+    gradient.addColorStop(1, "#0b1024")
     this.ctx.fillStyle = gradient
     this.ctx.fillRect(0, 0, this.width, this.height)
+
+    // nebula glow bands
+    this.ctx.fillStyle = "rgba(236, 72, 153, 0.12)"
+    this.ctx.beginPath()
+    this.ctx.ellipse(this.width * 0.6, this.height * 0.25, 220, 80, 0.4, 0, Math.PI * 2)
+    this.ctx.fill()
+    this.ctx.fillStyle = "rgba(34, 211, 238, 0.14)"
+    this.ctx.beginPath()
+    this.ctx.ellipse(this.width * 0.3, this.height * 0.18, 200, 70, -0.3, 0, Math.PI * 2)
+    this.ctx.fill()
   }
 
   drawSky() {
-    const glowHeight = 120
+    const glowHeight = 140
     const gradient = this.ctx.createLinearGradient(0, this.groundY - glowHeight, 0, this.groundY)
-    gradient.addColorStop(0, "rgba(56, 189, 248, 0.08)")
-    gradient.addColorStop(1, "rgba(56, 189, 248, 0)")
+    gradient.addColorStop(0, "rgba(94, 234, 212, 0.16)")
+    gradient.addColorStop(1, "rgba(94, 234, 212, 0)")
     this.ctx.fillStyle = gradient
     this.ctx.fillRect(0, this.groundY - glowHeight, this.width, glowHeight)
 
     const offset = (this.worldOffset * 0.2) % 90
-    this.ctx.fillStyle = "rgba(34, 211, 238, 0.35)"
+    this.ctx.fillStyle = "rgba(236, 72, 153, 0.45)"
     for (let x = -offset; x < this.width + 90; x += 90) {
-      this.ctx.fillRect(x, this.groundY - 24, 24, 2)
+      this.ctx.fillRect(x, this.groundY - 24, 28, 3)
     }
   }
 
@@ -95,14 +107,25 @@ export default class extends Controller {
         this.ctx.fill()
       }
     })
+
+    // light streaks
+    const streakOffset = (this.worldOffset * 1.2) % 260
+    this.ctx.strokeStyle = "rgba(244, 114, 182, 0.35)"
+    this.ctx.lineWidth = 3
+    for (let x = -streakOffset; x < this.width + 260; x += 260) {
+      this.ctx.beginPath()
+      this.ctx.moveTo(x, this.groundY - 110)
+      this.ctx.lineTo(x + 120, this.groundY - 80)
+      this.ctx.stroke()
+    }
   }
 
   drawGround() {
-    this.ctx.fillStyle = "#0f172a"
+    this.ctx.fillStyle = "#0b1229"
     this.ctx.fillRect(0, this.groundY, this.width, this.groundHeight)
 
-    this.ctx.strokeStyle = "#22d3ee33"
-    this.ctx.lineWidth = 2
+    this.ctx.strokeStyle = "#22d3ee99"
+    this.ctx.lineWidth = 3
     this.ctx.beginPath()
     const offset = this.worldOffset % 110
     for (let x = -offset - 110; x < this.width + 110; x += 110) {
@@ -142,70 +165,37 @@ export default class extends Controller {
 
   drawSkater() {
     const now = performance.now()
-    let air = Math.sin(this.t / 25) * 2
-    let boardTilt = Math.sin(this.t / 30) * 1.5
-    let flip = 0
-    let spin = 0
-    let bodyLean = Math.sin(this.t / 35) * 0.04
-    let grinding = false
-    let crouch = 0
+    const baseAir = Math.sin(this.t / 30) * 2
+    const baseTilt = Math.sin(this.t / 35) * 2
+    let pose = {
+      air: baseAir,
+      boardTilt: baseTilt,
+      flip: 0,
+      spin: 0,
+      bodyLean: Math.sin(this.t / 40) * 0.04,
+      crouch: 0,
+      grinding: false,
+      arms: 0,
+      knees: 0,
+      shoulders: 0
+    }
 
     if (this.trickState) {
       const { type, startedAt, duration } = this.trickState
       const progress = Math.min((now - startedAt) / duration, 1)
-      const ease = this.easeInOutSine(progress)
-
-      switch (type) {
-      case "flip":
-        air += 80 * ease
-        boardTilt -= 12 * ease
-        flip = this.degToRad(720 * ease)
-        crouch = 6 * (1 - ease)
-        break
-      case "shuv":
-        air += 56 * ease
-        spin = this.degToRad(360 * ease)
-        boardTilt -= 8 * ease
-        crouch = 4 * (1 - ease)
-        break
-      case "spin180":
-        air += 48 * ease
-        spin = this.degToRad(180 * ease)
-        bodyLean += 0.12 * Math.sin(progress * Math.PI)
-        crouch = 5 * (1 - ease)
-        break
-      case "manual":
-        air += 10
-        boardTilt += -16 + 26 * Math.sin(progress * Math.PI)
-        crouch = 3
-        break
-      case "grind":
-        air = 16
-        boardTilt = -6
-        bodyLean = 0.08 * Math.sin(progress * Math.PI)
-        grinding = true
-        crouch = 4
-        break
-      default: // ollie
-        air += 56 * ease
-        boardTilt -= 12 * ease
-        bodyLean += 0.06 * ease
-        crouch = 6 * (1 - ease)
-        break
-      }
-
+      pose = this.trickPose(type, progress, pose)
       if (progress >= 1) this.trickState = null
     }
 
     const x = this.skaterX
-    const y = this.groundY - 32 - air
+    const y = this.groundY - 32 - pose.air
 
-    this.drawShadow(x, this.groundY - 6, air)
+    this.drawShadow(x, this.groundY - 6, pose.air)
     this.ctx.save()
-    this.ctx.translate(x, y + crouch)
-    this.ctx.rotate(spin)
-    this.drawBoard(boardTilt, flip, grinding)
-    this.drawBody(bodyLean)
+    this.ctx.translate(x, y + pose.crouch)
+    this.ctx.rotate(pose.spin)
+    this.drawBoard(pose.boardTilt, pose.flip, pose.grinding)
+    this.drawBody(pose)
     this.ctx.restore()
   }
 
@@ -235,39 +225,42 @@ export default class extends Controller {
     this.ctx.restore()
   }
 
-  drawBody(lean) {
+  drawBody(pose) {
     this.ctx.save()
     this.ctx.translate(0, -4)
-    this.ctx.rotate(lean)
+    this.ctx.rotate(pose.bodyLean)
     this.ctx.lineCap = "round"
 
     // base silhouette
     this.ctx.strokeStyle = "#0f172a"
     this.ctx.lineWidth = 10
     this.ctx.beginPath()
-    this.ctx.moveTo(-6, -10)
-    this.ctx.lineTo(0, -38)
-    this.ctx.lineTo(-10, -70)
+    const shoulder = pose.shoulders * 8
+    this.ctx.moveTo(-6, -10 + shoulder)
+    this.ctx.lineTo(0, -38 + shoulder)
+    this.ctx.lineTo(-10, -70 + shoulder)
     this.ctx.stroke()
 
     // legs
     this.ctx.lineWidth = 11
     this.ctx.beginPath()
+    const kneeDrop = pose.knees * 12
     this.ctx.moveTo(-10, 32)
-    this.ctx.lineTo(-6, 8)
-    this.ctx.lineTo(-14, -12)
+    this.ctx.lineTo(-6, 10 + kneeDrop)
+    this.ctx.lineTo(-14, -12 + kneeDrop)
     this.ctx.moveTo(10, 32)
-    this.ctx.lineTo(4, 10)
-    this.ctx.lineTo(18, -10)
+    this.ctx.lineTo(4, 10 + kneeDrop)
+    this.ctx.lineTo(18, -10 + kneeDrop)
     this.ctx.stroke()
 
     // arms
     this.ctx.lineWidth = 9
     this.ctx.beginPath()
-    this.ctx.moveTo(-2, -26)
-    this.ctx.lineTo(-26, -14)
-    this.ctx.moveTo(-2, -26)
-    this.ctx.lineTo(26, -8)
+    const armLift = pose.arms * 18
+    this.ctx.moveTo(-2, -26 - armLift)
+    this.ctx.lineTo(-26, -14 - armLift * 0.6)
+    this.ctx.moveTo(-2, -26 - armLift)
+    this.ctx.lineTo(26, -8 - armLift * 0.4)
     this.ctx.stroke()
 
     // head
@@ -323,6 +316,66 @@ export default class extends Controller {
     if (name.includes("grind") || name.includes("slide")) return "grind"
     if (name.includes("manual")) return "manual"
     return "ollie"
+  }
+
+  trickPose(type, progress, base) {
+    const ease = this.easeInOutSine(progress)
+    const pose = { ...base }
+
+    switch (type) {
+    case "flip":
+      pose.air += 90 * ease
+      pose.boardTilt -= 16 * ease
+      pose.flip = this.degToRad(900 * ease)
+      pose.crouch = 10 * (1 - ease)
+      pose.arms = 0.8
+      pose.knees = 0.8
+      pose.shoulders = 0.2
+      break
+    case "shuv":
+      pose.air += 64 * ease
+      pose.spin = this.degToRad(360 * ease)
+      pose.boardTilt -= 10 * ease
+      pose.crouch = 8 * (1 - ease)
+      pose.arms = 0.6
+      pose.knees = 0.6
+      break
+    case "spin180":
+      pose.air += 56 * ease
+      pose.spin = this.degToRad(180 * ease)
+      pose.bodyLean += 0.16 * Math.sin(progress * Math.PI)
+      pose.crouch = 9 * (1 - ease)
+      pose.arms = 0.7
+      pose.knees = 0.5
+      pose.shoulders = 0.12
+      break
+    case "manual":
+      pose.air += 12
+      pose.boardTilt += -18 + 30 * Math.sin(progress * Math.PI)
+      pose.crouch = 6
+      pose.knees = 0.5
+      pose.arms = 0.2
+      break
+    case "grind":
+      pose.air = 18
+      pose.boardTilt = -8
+      pose.bodyLean = 0.1 * Math.sin(progress * Math.PI)
+      pose.grinding = true
+      pose.crouch = 6
+      pose.knees = 0.5
+      pose.arms = 0.3
+      break
+    default: // ollie
+      pose.air += 64 * ease
+      pose.boardTilt -= 14 * ease
+      pose.crouch = 10 * (1 - ease)
+      pose.knees = 0.6
+      pose.arms = 0.4
+      pose.shoulders = 0.1
+      break
+    }
+
+    return pose
   }
 
   trickDuration(type) {
