@@ -39,7 +39,8 @@ export default class extends Controller {
     this.trickState = {
       type,
       startedAt: performance.now(),
-      duration: this.trickDuration(type)
+      duration: this.trickDuration(type),
+      landed: false
     }
   }
 
@@ -147,6 +148,7 @@ export default class extends Controller {
     let spin = 0
     let bodyLean = Math.sin(this.t / 35) * 0.04
     let grinding = false
+    let crouch = 0
 
     if (this.trickState) {
       const { type, startedAt, duration } = this.trickState
@@ -155,33 +157,40 @@ export default class extends Controller {
 
       switch (type) {
       case "flip":
-        air += 60 * ease
-        boardTilt -= 6
-        flip = this.degToRad(540 * ease)
+        air += 80 * ease
+        boardTilt -= 12 * ease
+        flip = this.degToRad(720 * ease)
+        crouch = 6 * (1 - ease)
         break
       case "shuv":
-        air += 42 * ease
+        air += 56 * ease
         spin = this.degToRad(360 * ease)
+        boardTilt -= 8 * ease
+        crouch = 4 * (1 - ease)
         break
       case "spin180":
-        air += 35 * ease
+        air += 48 * ease
         spin = this.degToRad(180 * ease)
-        bodyLean += 0.1 * Math.sin(progress * Math.PI)
+        bodyLean += 0.12 * Math.sin(progress * Math.PI)
+        crouch = 5 * (1 - ease)
         break
       case "manual":
-        air += 8
-        boardTilt += -12 + 24 * Math.sin(progress * Math.PI)
+        air += 10
+        boardTilt += -16 + 26 * Math.sin(progress * Math.PI)
+        crouch = 3
         break
       case "grind":
-        air = 14
-        boardTilt = -4
+        air = 16
+        boardTilt = -6
         bodyLean = 0.08 * Math.sin(progress * Math.PI)
         grinding = true
+        crouch = 4
         break
       default: // ollie
-        air += 48 * ease
-        boardTilt -= 10 * ease
-        bodyLean += 0.05 * ease
+        air += 56 * ease
+        boardTilt -= 12 * ease
+        bodyLean += 0.06 * ease
+        crouch = 6 * (1 - ease)
         break
       }
 
@@ -193,7 +202,7 @@ export default class extends Controller {
 
     this.drawShadow(x, this.groundY - 6, air)
     this.ctx.save()
-    this.ctx.translate(x, y)
+    this.ctx.translate(x, y + crouch)
     this.ctx.rotate(spin)
     this.drawBoard(boardTilt, flip, grinding)
     this.drawBody(bodyLean)
@@ -230,39 +239,67 @@ export default class extends Controller {
     this.ctx.save()
     this.ctx.translate(0, -4)
     this.ctx.rotate(lean)
-    this.ctx.strokeStyle = "#e5e7eb"
-    this.ctx.lineWidth = 4
     this.ctx.lineCap = "round"
 
-    // legs
+    // pants
+    this.ctx.strokeStyle = "#1f2937"
+    this.ctx.lineWidth = 5
     this.ctx.beginPath()
     this.ctx.moveTo(-8, 28)
-    this.ctx.lineTo(-6, 10)
+    this.ctx.lineTo(-6, 12)
     this.ctx.lineTo(-12, -6)
     this.ctx.moveTo(8, 28)
-    this.ctx.lineTo(6, 10)
+    this.ctx.lineTo(6, 12)
     this.ctx.lineTo(14, -6)
     this.ctx.stroke()
 
-    // torso
+    // shoes
+    this.ctx.strokeStyle = "#e5e7eb"
+    this.ctx.lineWidth = 4
     this.ctx.beginPath()
-    this.ctx.moveTo(-2, -6)
-    this.ctx.lineTo(0, -30)
+    this.ctx.moveTo(-12, -6)
+    this.ctx.lineTo(-16, -6)
+    this.ctx.moveTo(14, -6)
+    this.ctx.lineTo(18, -6)
+    this.ctx.stroke()
+
+    // hoodie torso
+    this.ctx.fillStyle = "#2563eb"
+    this.ctx.strokeStyle = "#1d4ed8"
+    this.ctx.lineWidth = 4
+    this.ctx.beginPath()
+    this.ctx.moveTo(-4, -6)
+    this.ctx.lineTo(2, -32)
     this.ctx.lineTo(-10, -52)
+    this.ctx.lineTo(-18, -30)
+    this.ctx.closePath()
+    this.ctx.fill()
     this.ctx.stroke()
 
     // arms
+    this.ctx.strokeStyle = "#1d4ed8"
+    this.ctx.lineWidth = 4
     this.ctx.beginPath()
-    this.ctx.moveTo(0, -26)
-    this.ctx.lineTo(-16, -18)
-    this.ctx.moveTo(0, -26)
+    this.ctx.moveTo(-2, -28)
+    this.ctx.lineTo(-18, -18)
+    this.ctx.moveTo(-2, -28)
     this.ctx.lineTo(24, -16)
     this.ctx.stroke()
 
     // head
+    this.ctx.strokeStyle = "#e5e7eb"
+    this.ctx.lineWidth = 4
     this.ctx.beginPath()
-    this.ctx.arc(-6, -62, 8, 0, Math.PI * 2)
+    this.ctx.arc(-8, -60, 8, 0, Math.PI * 2)
     this.ctx.stroke()
+
+    // beanie
+    this.ctx.fillStyle = "#fbbf24"
+    this.ctx.beginPath()
+    this.ctx.arc(-8, -64, 9, Math.PI, 0)
+    this.ctx.lineTo(1, -64)
+    this.ctx.arc(-8, -64, 9, 0, Math.PI, true)
+    this.ctx.fill()
 
     this.ctx.restore()
   }

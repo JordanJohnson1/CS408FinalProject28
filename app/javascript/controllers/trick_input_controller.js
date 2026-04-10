@@ -20,6 +20,7 @@ export default class extends Controller {
 
   handleKeyDown(event) {
     if (event.repeat) return
+    if (this.isMovementKey(event.key)) event.preventDefault()
     const key = this.normalizeKey(event.key)
     this.pressed.add(key)
     this.renderKeys()
@@ -66,5 +67,10 @@ export default class extends Controller {
     if (lower === "spacebar") return "space"
     if (lower.startsWith("arrow")) return lower.replace("arrow", "")
     return lower
+  }
+
+  isMovementKey(rawKey) {
+    const key = rawKey.toLowerCase()
+    return key === " " || key === "spacebar" || key.startsWith("arrow")
   }
 }
