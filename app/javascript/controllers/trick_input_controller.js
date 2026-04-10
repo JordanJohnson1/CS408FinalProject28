@@ -6,6 +6,7 @@ export default class extends Controller {
 
   connect() {
     this.pressed = new Set()
+    this.lastTriggeredSignature = null
     this.renderKeys()
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleKeyUp = this.handleKeyUp.bind(this)
@@ -21,7 +22,10 @@ export default class extends Controller {
   handleKeyDown(event) {
     if (event.repeat) return
     if (this.isMovementKey(event.key)) event.preventDefault()
+
     const key = this.normalizeKey(event.key)
+    if (!key) return
+
     this.pressed.add(key)
     this.renderKeys()
     this.checkForTrick()
@@ -29,19 +33,56 @@ export default class extends Controller {
 
   handleKeyUp(event) {
     const key = this.normalizeKey(event.key)
+    if (!key) return
+
     this.pressed.delete(key)
+    this.lastTriggeredSignature = null
     this.renderKeys()
   }
 
   checkForTrick() {
     const keys = Array.from(this.pressed)
-    this.tricksValue.forEach(trick => {
-      const needed = trick.input.split("+").map(k => k.trim().toLowerCase())
-      const matches = needed.every(key => keys.includes(key))
-      if (matches) {
-        this.dispatch("triggered", { detail: { trickId: trick.id, input: trick.input } })
+    const matched = this.findBestMatch(keys)
+    if (!matched) return
+
+    const signature = this.comboSignature(matched.input)
+    if (this.lastTriggeredSignature === signature) return
+
+    this.lastTriggeredSignature = signature
+    this.dispatch("triggered", {
+      detail: {
+        trickId: matched.id,
+        input: matched.input,
+        name: matched.name
       }
     })
+  }
+
+  findBestMatch(keys) {
+    const normalizedKeys = [...keys].sort()
+
+    return [...this.tricksValue]
+      .sort((a, b) => {
+        const lenDiff = this.parseInput(b.input).length - this.parseInput(a.input).length
+        if (lenDiff !== 0) return lenDiff
+        return (b.difficulty || 0) - (a.difficulty || 0)
+      })
+      .find(trick => {
+        const needed = this.parseInput(trick.input)
+        return needed.length === normalizedKeys.length && needed.every((key, index) => key === normalizedKeys[index])
+      })
+  }
+
+  parseInput(input) {
+    return input
+      .split("+")
+      .map(key => key.trim().toLowerCase())
+      .filter(Boolean)
+      .sort()
+  }
+
+  comboSignature(input) {
+    return this.parseInput(input).join("+")
   }
 
   renderKeys() {
@@ -66,7 +107,7 @@ export default class extends Controller {
     if (lower === " ") return "space"
     if (lower === "spacebar") return "space"
     if (lower.startsWith("arrow")) return lower.replace("arrow", "")
-    return lower
+    return ["up", "down", "left", "right", "space"].includes(lower) ? lower : null
   }
 
   isMovementKey(rawKey) {

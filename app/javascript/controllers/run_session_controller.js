@@ -105,8 +105,6 @@ export default class extends Controller {
         this.pushLog(trick, multiplier)
         this.updateQueue(trick, multiplier)
         this.setStatus("Active")
-        this.skateCanvasController?.flash(trick.name)
-        this.skateCanvasController?.playTrick(trick)
       })
       .catch(() => this.setStatus("Error"))
   }
