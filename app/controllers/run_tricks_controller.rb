@@ -9,8 +9,8 @@ class RunTricksController < ApplicationController
       trick:,
       input_used: run_trick_params[:input_used],
       success: run_trick_params.fetch(:success, true),
-      multiplier: run_trick_params[:multiplier] || 1.0,
-      combo_count: run_trick_params[:combo_count],
+      multiplier: multiplier_param,
+      combo_count: combo_count_param,
       occurred_at: Time.current
     )
 
@@ -28,5 +28,14 @@ class RunTricksController < ApplicationController
 
   def run_trick_params
     params.permit(:run_id, :trick_id, :input_used, :success, :multiplier, :combo_count)
+  end
+
+  def multiplier_param
+    (run_trick_params[:multiplier] || 1.0).to_f.clamp(1.0, 10.0)
+  end
+
+  def combo_count_param
+    count = run_trick_params[:combo_count].to_i
+    count.positive? ? count : nil
   end
 end
