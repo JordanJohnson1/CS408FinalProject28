@@ -215,12 +215,12 @@ export default class extends Controller {
     this.ctx.rotate(this.degToRad(angleDeg))
     this.ctx.scale(Math.cos(flipRad), 1)
 
-    this.ctx.strokeStyle = grinding ? "#22d3ee" : "#f97316"
-    this.ctx.lineWidth = 7
+    this.ctx.strokeStyle = grinding ? "#22d3ee" : "#111827"
+    this.ctx.lineWidth = 8
     this.ctx.lineCap = "round"
     this.ctx.beginPath()
-    this.ctx.moveTo(-28, 0)
-    this.ctx.lineTo(28, 0)
+    this.ctx.moveTo(-32, 0)
+    this.ctx.lineTo(32, 0)
     this.ctx.stroke()
 
     this.ctx.lineWidth = 3
@@ -241,65 +241,59 @@ export default class extends Controller {
     this.ctx.rotate(lean)
     this.ctx.lineCap = "round"
 
-    // pants
-    this.ctx.strokeStyle = "#1f2937"
-    this.ctx.lineWidth = 5
+    // base silhouette
+    this.ctx.strokeStyle = "#0f172a"
+    this.ctx.lineWidth = 10
     this.ctx.beginPath()
-    this.ctx.moveTo(-8, 28)
-    this.ctx.lineTo(-6, 12)
-    this.ctx.lineTo(-12, -6)
-    this.ctx.moveTo(8, 28)
-    this.ctx.lineTo(6, 12)
-    this.ctx.lineTo(14, -6)
+    this.ctx.moveTo(-6, -10)
+    this.ctx.lineTo(0, -38)
+    this.ctx.lineTo(-10, -70)
     this.ctx.stroke()
 
-    // shoes
-    this.ctx.strokeStyle = "#e5e7eb"
-    this.ctx.lineWidth = 4
+    // legs
+    this.ctx.lineWidth = 11
     this.ctx.beginPath()
-    this.ctx.moveTo(-12, -6)
-    this.ctx.lineTo(-16, -6)
-    this.ctx.moveTo(14, -6)
-    this.ctx.lineTo(18, -6)
-    this.ctx.stroke()
-
-    // hoodie torso
-    this.ctx.fillStyle = "#2563eb"
-    this.ctx.strokeStyle = "#1d4ed8"
-    this.ctx.lineWidth = 4
-    this.ctx.beginPath()
-    this.ctx.moveTo(-4, -6)
-    this.ctx.lineTo(2, -32)
-    this.ctx.lineTo(-10, -52)
-    this.ctx.lineTo(-18, -30)
-    this.ctx.closePath()
-    this.ctx.fill()
+    this.ctx.moveTo(-10, 32)
+    this.ctx.lineTo(-6, 8)
+    this.ctx.lineTo(-14, -12)
+    this.ctx.moveTo(10, 32)
+    this.ctx.lineTo(4, 10)
+    this.ctx.lineTo(18, -10)
     this.ctx.stroke()
 
     // arms
-    this.ctx.strokeStyle = "#1d4ed8"
-    this.ctx.lineWidth = 4
+    this.ctx.lineWidth = 9
     this.ctx.beginPath()
-    this.ctx.moveTo(-2, -28)
-    this.ctx.lineTo(-18, -18)
-    this.ctx.moveTo(-2, -28)
-    this.ctx.lineTo(24, -16)
+    this.ctx.moveTo(-2, -26)
+    this.ctx.lineTo(-26, -14)
+    this.ctx.moveTo(-2, -26)
+    this.ctx.lineTo(26, -8)
     this.ctx.stroke()
 
     // head
-    this.ctx.strokeStyle = "#e5e7eb"
+    this.ctx.fillStyle = "#0f172a"
+    this.ctx.beginPath()
+    this.ctx.arc(-8, -80, 10, 0, Math.PI * 2)
+    this.ctx.fill()
+
+    // backpack
+    this.ctx.strokeStyle = "#22d3ee"
     this.ctx.lineWidth = 4
     this.ctx.beginPath()
-    this.ctx.arc(-8, -60, 8, 0, Math.PI * 2)
+    this.ctx.moveTo(-12, -52)
+    this.ctx.lineTo(-2, -20)
+    this.ctx.lineTo(10, -16)
     this.ctx.stroke()
 
-    // beanie
-    this.ctx.fillStyle = "#fbbf24"
+    // accent on board stance
+    this.ctx.strokeStyle = "#22d3ee"
+    this.ctx.lineWidth = 3
     this.ctx.beginPath()
-    this.ctx.arc(-8, -64, 9, Math.PI, 0)
-    this.ctx.lineTo(1, -64)
-    this.ctx.arc(-8, -64, 9, 0, Math.PI, true)
-    this.ctx.fill()
+    this.ctx.moveTo(-14, -12)
+    this.ctx.lineTo(-16, -6)
+    this.ctx.moveTo(18, -10)
+    this.ctx.lineTo(20, -4)
+    this.ctx.stroke()
 
     this.ctx.restore()
   }
