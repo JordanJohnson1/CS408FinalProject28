@@ -10,7 +10,10 @@ class PagesController < ApplicationController
     @tricks = Trick.order(:difficulty, :name)
   end
 
-  def shop; end
+  def shop
+    @shop_upgrades = Player::SHOP_UPGRADES
+    @owned_upgrade_keys = current_player&.owned_upgrade_keys || []
+  end
 
   def leaderboard
     @top_players = Player.order(coins: :desc).limit(10)

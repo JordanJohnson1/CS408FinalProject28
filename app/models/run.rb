@@ -16,7 +16,7 @@ class Run < ApplicationRecord
   end
 
   def apply_trick!(trick:, input_used:, success: true, multiplier: 1.0, combo_count: nil, occurred_at: Time.current)
-    rewards = trick.reward(multiplier:)
+    rewards = player.reward_for(trick, multiplier:)
 
     run_tricks.create!(
       trick:,
@@ -30,5 +30,6 @@ class Run < ApplicationRecord
     increment!(:xp_earned, rewards[:xp])
     increment!(:coins_earned, rewards[:coins])
     player.add_rewards!(xp: rewards[:xp], coins: rewards[:coins], combo_count:)
+    rewards
   end
 end

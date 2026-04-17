@@ -4,39 +4,43 @@
       <div>
         <p class="eyebrow text-uppercase mb-2">Gear shop</p>
         <h2 class="fw-bold mb-1">Upgrade your stick skater</h2>
-        <p class="text-muted mb-0">Pick boards, wheels, bearings, and flair to boost speed, coins, and style multipliers.</p>
+        <p class="text-muted mb-0">Buy permanent upgrades with coins. Purchases save immediately and affect future runs.</p>
       </div>
       <div class="text-end">
         <p class="text-muted small mb-1">Coins available</p>
-        <div class="fs-3 fw-bold">3,210</div>
+        <div class="fs-3 fw-bold"><%= current_player&.coins || 0 %></div>
       </div>
     </div>
   </div>
 
   <div class="row g-3 g-lg-4">
-    <% items = [
-      { name: "Maple street deck", type: "Deck", price: 950, bonus: "+12% speed" },
-      { name: "Carbon fiber deck", type: "Deck", price: 1400, bonus: "+20% speed" },
-      { name: "Ceramic bearings", type: "Bearings", price: 780, bonus: "+15% coin gain" },
-      { name: "LED wheels", type: "Wheels", price: 620, bonus: "+8% style" },
-      { name: "Pro trucks", type: "Trucks", price: 540, bonus: "+6% stability" },
-      { name: "Griptape flair", type: "Flair", price: 300, bonus: "+5% combo chance" }
-    ] %>
-
-    <% items.each do |item| %>
+    <% @shop_upgrades.each do |item| %>
+      <% owned = @owned_upgrade_keys.include?(item[:key]) %>
+      <% can_afford = current_player && current_player.coins >= item[:price] %>
       <div class="col-md-4">
         <div class="card h-100 border-0 card-shadow">
           <div class="card-body p-4 d-flex flex-column">
             <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="badge bg-skate-soft text-dark"><%= item[:type] %></span>
+              <span class="badge bg-skate-soft text-dark"><%= item[:category] %></span>
               <span class="fw-semibold">$<%= item[:price] %></span>
             </div>
-            <h5 class="fw-bold mb-2"><%= item[:name] %></h5>
-            <p class="text-muted flex-grow-1"><%= item[:bonus] %></p>
-            <div class="d-flex gap-2">
-              <button class="btn btn-sm btn-dark flex-grow-1" type="button">Equip</button>
-              <button class="btn btn-sm btn-outline-secondary" type="button">Details</button>
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+              <h5 class="fw-bold mb-0"><%= item[:name] %></h5>
+              <% if owned %>
+                <span class="badge bg-success">Owned</span>
+              <% end %>
             </div>
+            <p class="text-muted flex-grow-1 mb-3"><%= item[:bonus] %></p>
+
+            <% if current_player.nil? %>
+              <a class="btn btn-sm btn-outline-dark mt-auto" href="<%= new_player_path %>">Create player</a>
+            <% elsif owned %>
+              <button class="btn btn-sm btn-outline-success mt-auto" type="button" disabled>Purchased</button>
+            <% else %>
+              <%= button_to "Buy upgrade", shop_upgrade_purchase_path(item[:key]), method: :post,
+                    class: "btn btn-sm btn-dark mt-auto",
+                    disabled: !can_afford %>
+            <% end %>
           </div>
         </div>
       </div>
@@ -47,15 +51,12 @@
     <div class="card-body p-4">
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
         <div>
-          <h5 class="fw-semibold mb-1">Bundle: Speedline</h5>
-          <p class="text-muted mb-0">Deck + bearings + wheels for a stacked speed boost.</p>
+          <h5 class="fw-semibold mb-1">Save system</h5>
+          <p class="text-muted mb-0">Coins, XP, combos, and owned upgrades are saved to your player profile after every successful trick and purchase.</p>
         </div>
-        <div class="d-flex align-items-center gap-3">
-          <div class="text-end">
-            <small class="text-muted d-block">Price</small>
-            <span class="fw-bold">2,200</span>
-          </div>
-          <a class="btn btn-skate" href="#">Buy bundle</a>
+        <div class="text-end">
+          <small class="text-muted d-block">Owned upgrades</small>
+          <span class="fw-bold"><%= @owned_upgrade_keys.size %> / <%= @shop_upgrades.size %></span>
         </div>
       </div>
     </div>

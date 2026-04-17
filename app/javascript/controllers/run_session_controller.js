@@ -5,7 +5,9 @@ export default class extends Controller {
     createUrl: String,
     runTricksUrl: String,
     player: Object,
-    tricks: Array
+    tricks: Array,
+    comboResetMs: Number,
+    trickCooldownMs: Number
   }
 
   static targets = [
@@ -18,7 +20,9 @@ export default class extends Controller {
     "queue",
     "log",
     "runTotal",
-    "playerName"
+    "playerName",
+    "saveStatus",
+    "trickCooldown"
   ]
 
   connect() {
@@ -29,15 +33,23 @@ export default class extends Controller {
     this.comboCount = 0
     this.comboMultiplier = 1
     this.comboTimer = null
-    this.comboResetMs = 3200
+    this.comboResetMs = this.hasComboResetMsValue ? this.comboResetMsValue : 3200
+    this.trickCooldownUntil = 0
+    this.trickCooldownTicker = null
+    this.trickRequestInFlight = false
     this.csrfToken = document.querySelector("meta[name='csrf-token']")?.content
-    this.element.addEventListener("trick-input:triggered", (event) => this.handleTrick(event))
+    this.boundHandleTrick = this.boundHandleTrick || ((event) => this.handleTrick(event))
+    this.element.addEventListener("trick-input:triggered", this.boundHandleTrick)
     this.skateCanvasController = this.application.getControllerForElementAndIdentifier(this.element, "skate-canvas")
+    this.renderSavedState()
+    this.renderTrickCooldown()
   }
 
   disconnect() {
+    this.element.removeEventListener("trick-input:triggered", this.boundHandleTrick)
     if (this.ticker) clearInterval(this.ticker)
     if (this.comboTimer) clearTimeout(this.comboTimer)
+    if (this.trickCooldownTicker) clearInterval(this.trickCooldownTicker)
   }
 
   start() {
@@ -56,6 +68,8 @@ export default class extends Controller {
         this.startTime = Date.now()
         this.setStatus("Active")
         this.startClock()
+        this.updatePlayer(data.player)
+        this.persistProgress(data.player)
       })
       .catch(() => this.setStatus("Error"))
   }
@@ -68,6 +82,11 @@ export default class extends Controller {
       headers: this.headers(),
       body: new URLSearchParams({ status: "finished", duration_ms: duration })
     })
+      .then(res => res.json())
+      .then(data => {
+        this.updatePlayer(data.player)
+        this.persistProgress(data.player)
+      })
       .finally(() => {
         this.setStatus("Finished")
         if (this.ticker) clearInterval(this.ticker)
@@ -79,12 +98,17 @@ export default class extends Controller {
 
   handleTrick(event) {
     if (!this.runId) return
+    if (this.trickRequestInFlight) return
+    if (Date.now() < this.trickCooldownUntil) return
+
     const { trickId, input } = event.detail
     const trick = this.tricksValue.find(t => t.id === trickId)
     if (!trick) return
 
     const multiplier = this.comboMultiplier
     const comboCount = this.comboCount + 1
+    this.trickRequestInFlight = true
+    this.startTrickCooldown()
 
     fetch(this.runTricksUrlValue, {
       method: "POST",
@@ -102,11 +126,15 @@ export default class extends Controller {
         this.runCoins = data.run.coins_earned
         this.bumpCombo()
         this.updatePlayer(data.player)
-        this.pushLog(trick, multiplier)
-        this.updateQueue(trick, multiplier)
+        this.persistProgress(data.player)
+        this.pushLog(trick, multiplier, data.rewards)
+        this.updateQueue(trick, multiplier, data.rewards)
         this.setStatus("Active")
       })
       .catch(() => this.setStatus("Error"))
+      .finally(() => {
+        this.trickRequestInFlight = false
+      })
   }
 
   startClock() {
@@ -121,6 +149,7 @@ export default class extends Controller {
   }
 
   updatePlayer(player) {
+    this.playerValue = player
     this.coinsTarget.textContent = player.coins
     this.xpTarget.textContent = player.xp
     this.bestComboTarget.textContent = player.best_combo
@@ -128,12 +157,12 @@ export default class extends Controller {
     this.runTotalTarget.textContent = `${this.runCoins} coins`
   }
 
-  pushLog(trick, multiplier = 1) {
+  pushLog(trick, multiplier = 1, rewards = null) {
     if (!this.hasLogTarget) return
     const item = document.createElement("div")
     item.className = "log-entry"
-    const coins = Math.round(trick.baseCoins * multiplier)
-    const xp = Math.round(trick.baseXp * multiplier)
+    const coins = rewards?.coins ?? Math.round(trick.baseCoins * multiplier)
+    const xp = rewards?.xp ?? Math.round(trick.baseXp * multiplier)
     item.innerHTML = `<div class="fw-semibold">${trick.name}</div><div class="text-muted small">${coins} coins • ${xp} XP • x${multiplier.toFixed(1)}</div>`
     this.logTarget.prepend(item)
     while (this.logTarget.children.length > 10) {
@@ -141,11 +170,11 @@ export default class extends Controller {
     }
   }
 
-  updateQueue(trick, multiplier = 1) {
+  updateQueue(trick, multiplier = 1, rewards = null) {
     if (!this.hasQueueTarget) return
     const li = document.createElement("li")
     li.className = "queue-item"
-    const coins = Math.round(trick.baseCoins * multiplier)
+    const coins = rewards?.coins ?? Math.round(trick.baseCoins * multiplier)
     li.innerHTML = `<div><div class="fw-semibold">${trick.name}</div><small class="text-muted">Inputs: ${trick.input}</small></div><span class="badge bg-light text-dark">+${coins} coins • x${multiplier.toFixed(1)}</span>`
     this.queueTarget.prepend(li)
     while (this.queueTarget.children.length > 4) {
@@ -173,6 +202,78 @@ export default class extends Controller {
     this.comboCount = 0
     this.comboMultiplier = 1
     if (this.hasComboTarget) this.comboTarget.textContent = `x${this.comboMultiplier.toFixed(1)} (${this.comboCount})`
+  }
+
+  startTrickCooldown() {
+    const cooldownMs = this.hasTrickCooldownMsValue ? this.trickCooldownMsValue : 900
+    this.trickCooldownUntil = Date.now() + cooldownMs
+    this.renderTrickCooldown()
+
+    if (this.trickCooldownTicker) clearInterval(this.trickCooldownTicker)
+    this.trickCooldownTicker = setInterval(() => {
+      this.renderTrickCooldown()
+      if (Date.now() >= this.trickCooldownUntil) {
+        clearInterval(this.trickCooldownTicker)
+        this.trickCooldownTicker = null
+      }
+    }, 100)
+  }
+
+  renderTrickCooldown() {
+    if (!this.hasTrickCooldownTarget) return
+
+    const remainingMs = this.trickCooldownUntil - Date.now()
+    if (remainingMs <= 0) {
+      this.trickCooldownTarget.textContent = "Ready"
+      this.trickCooldownTarget.className = "badge bg-skate-soft text-dark"
+      return
+    }
+
+    this.trickCooldownTarget.textContent = `${(remainingMs / 1000).toFixed(1)}s cooldown`
+    this.trickCooldownTarget.className = "badge bg-warning text-dark"
+  }
+
+  persistProgress(player) {
+    if (!player?.id) return
+
+    const savedAt = new Date().toISOString()
+    try {
+      window.localStorage.setItem(this.storageKey(player.id), JSON.stringify({ player, savedAt }))
+    } catch {
+      return
+    }
+
+    this.renderSaveStatus(savedAt)
+  }
+
+  renderSavedState() {
+    if (!this.hasSaveStatusTarget || !this.playerValue?.id) return
+
+    try {
+      const saved = window.localStorage.getItem(this.storageKey(this.playerValue.id))
+      if (!saved) return
+
+      const payload = JSON.parse(saved)
+      if (payload?.savedAt) this.renderSaveStatus(payload.savedAt)
+    } catch {
+      this.saveStatusTarget.textContent = "Autosave unavailable"
+    }
+  }
+
+  renderSaveStatus(savedAt) {
+    if (!this.hasSaveStatusTarget) return
+
+    const timestamp = new Date(savedAt)
+    if (Number.isNaN(timestamp.getTime())) {
+      this.saveStatusTarget.textContent = "Progress saved"
+      return
+    }
+
+    this.saveStatusTarget.textContent = `Saved ${timestamp.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" })}`
+  }
+
+  storageKey(playerId) {
+    return `stick-skater-save-${playerId}`
   }
 
   headers() {

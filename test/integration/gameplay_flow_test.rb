@@ -24,4 +24,17 @@ class GameplayFlowTest < ActionDispatch::IntegrationTest
     assert_equal trick.base_coins, body.dig("run", "coins_earned")
     assert_equal trick.base_xp, body.dig("run", "xp_earned")
   end
+
+  test "buying an upgrade deducts coins and persists ownership" do
+    post players_path, params: { player: { name: "Shopper", avatar_color: "#112233" } }
+    player = Player.find_by!(name: "Shopper")
+    player.update!(coins: 1_000)
+
+    post shop_upgrade_purchase_path("maple_street_deck")
+
+    assert_redirected_to shop_path
+    player.reload
+    assert_equal 50, player.coins
+    assert_includes player.owned_upgrade_keys, "maple_street_deck"
+  end
 end

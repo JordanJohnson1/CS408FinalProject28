@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   get "/play", to: "pages#play"
   get "/shop", to: "pages#shop"
   get "/leaderboard", to: "pages#leaderboard"
+  post "/shop/upgrades/:key", to: "shop_upgrades#create", as: :shop_upgrade_purchase
 
   resources :players, only: %i[new create show]
   resources :runs, only: %i[create update]

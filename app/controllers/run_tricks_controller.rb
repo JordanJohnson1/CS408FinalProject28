@@ -5,7 +5,7 @@ class RunTricksController < ApplicationController
     run = current_player.runs.find(run_trick_params[:run_id])
     trick = Trick.find(run_trick_params[:trick_id])
 
-    run.apply_trick!(
+    rewards = run.apply_trick!(
       trick:,
       input_used: run_trick_params[:input_used],
       success: run_trick_params.fetch(:success, true),
@@ -16,7 +16,8 @@ class RunTricksController < ApplicationController
 
     render json: {
       run: run.as_json(only: %i[id status coins_earned xp_earned]),
-      player: run.player.as_json(only: %i[id name coins xp best_combo total_tricks total_coins_earned])
+      player: run.player.as_json(only: %i[id name coins xp best_combo total_tricks total_coins_earned]),
+      rewards:
     }
   rescue ActiveRecord::RecordNotFound => e
     render json: { error: e.message }, status: :not_found

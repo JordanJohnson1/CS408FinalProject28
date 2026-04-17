@@ -14,9 +14,11 @@
   <div class="d-flex flex-column gap-4" data-controller="run-session trick-input skate-canvas"
        data-run-session-create-url-value="<%= runs_path %>"
        data-run-session-run-tricks-url-value="<%= run_tricks_path %>"
+       data-run-session-combo-reset-ms-value="<%= current_player.combo_reset_ms %>"
+       data-run-session-trick-cooldown-ms-value="900"
        data-run-session-player-value="<%= current_player.as_json(only: [:id, :name, :coins, :xp, :best_combo, :total_tricks]).to_json %>"
-       data-run-session-tricks-value='<%= @tricks.map { |t| { id: t.id, name: t.name, input: t.input_sequence, baseCoins: t.base_coins, baseXp: t.base_xp, difficulty: t.difficulty } }.to_json %>'
-       data-trick-input-tricks-value='<%= @tricks.map { |t| { id: t.id, name: t.name, input: t.input_sequence } }.to_json %>'>
+        data-run-session-tricks-value='<%= @tricks.map { |t| { id: t.id, name: t.name, input: t.input_sequence, baseCoins: t.base_coins, baseXp: t.base_xp, difficulty: t.difficulty } }.to_json %>'
+        data-trick-input-tricks-value='<%= @tricks.map { |t| { id: t.id, name: t.name, input: t.input_sequence, difficulty: t.difficulty } }.to_json %>'>
     <div class="card border-0 card-shadow">
       <div class="card-body p-4">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
@@ -28,6 +30,7 @@
           <div class="text-end">
             <p class="text-muted small mb-1">Run status</p>
             <div class="fs-5 fw-bold" data-run-session-target="status">Waiting</div>
+            <div class="small text-muted mt-1" data-run-session-target="saveStatus">Progress saved on each trick</div>
           </div>
         </div>
         <div class="row g-3">
@@ -83,7 +86,7 @@
           <div class="card-body p-4 d-flex flex-column gap-3">
             <div class="d-flex justify-content-between align-items-center">
               <h5 class="fw-semibold mb-0">Trick input</h5>
-              <span class="badge bg-skate-soft text-dark">Keyboard</span>
+              <span class="badge bg-skate-soft text-dark" data-run-session-target="trickCooldown">Ready</span>
             </div>
             <div class="d-flex flex-wrap gap-2" data-trick-input-target="keys"></div>
             <div>
