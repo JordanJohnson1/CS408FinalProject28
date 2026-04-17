@@ -1,4 +1,5 @@
 require "json"
+require "bigdecimal"
 
 class Player < ApplicationRecord
   has_many :runs, dependent: :destroy
@@ -64,8 +65,8 @@ class Player < ApplicationRecord
     base_rewards = trick.reward(multiplier:)
 
     {
-      xp: (base_rewards[:xp] * trick_xp_multiplier).to_i,
-      coins: (base_rewards[:coins] * trick_coin_multiplier).to_i
+      xp: (BigDecimal(base_rewards[:xp].to_s) * trick_xp_multiplier).to_i,
+      coins: (BigDecimal(base_rewards[:coins].to_s) * trick_coin_multiplier).to_i
     }
   end
 
@@ -105,11 +106,11 @@ class Player < ApplicationRecord
   end
 
   def trick_coin_multiplier
-    1.0 + purchased_upgrades.sum { |upgrade| upgrade.dig(:effect, :coin_multiplier).to_f }
+    BigDecimal("1") + purchased_upgrades.sum(BigDecimal("0")) { |upgrade| BigDecimal(upgrade.dig(:effect, :coin_multiplier).to_s) }
   end
 
   def trick_xp_multiplier
-    1.0 + purchased_upgrades.sum { |upgrade| upgrade.dig(:effect, :xp_multiplier).to_f }
+    BigDecimal("1") + purchased_upgrades.sum(BigDecimal("0")) { |upgrade| BigDecimal(upgrade.dig(:effect, :xp_multiplier).to_s) }
   end
 
   def combo_reset_ms

@@ -4,6 +4,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   test "should get index" do
     get root_url
     assert_response :success
-    assert_includes @response.body, "Hello World"
+    assert_includes @response.body, "Stick Skater"
   end
 end
