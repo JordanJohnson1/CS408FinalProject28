@@ -106,14 +106,21 @@ class Player < ApplicationRecord
   end
 
   def trick_coin_multiplier
-    BigDecimal("1") + purchased_upgrades.sum(BigDecimal("0")) { |upgrade| BigDecimal(upgrade.dig(:effect, :coin_multiplier).to_s) }
+    BigDecimal("1") + purchased_upgrades.sum(BigDecimal("0")) { |upgrade| upgrade_effect_decimal(upgrade, :coin_multiplier) }
   end
 
   def trick_xp_multiplier
-    BigDecimal("1") + purchased_upgrades.sum(BigDecimal("0")) { |upgrade| BigDecimal(upgrade.dig(:effect, :xp_multiplier).to_s) }
+    BigDecimal("1") + purchased_upgrades.sum(BigDecimal("0")) { |upgrade| upgrade_effect_decimal(upgrade, :xp_multiplier) }
   end
 
   def combo_reset_ms
     3200 + purchased_upgrades.sum { |upgrade| upgrade.dig(:effect, :combo_reset_ms).to_i }
+  end
+
+  def upgrade_effect_decimal(upgrade, effect_key)
+    value = upgrade.dig(:effect, effect_key)
+    return BigDecimal("0") if value.nil?
+
+    BigDecimal(value.to_s)
   end
 end

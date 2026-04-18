@@ -37,4 +37,25 @@ class GameplayFlowTest < ActionDispatch::IntegrationTest
     assert_equal 50, player.coins
     assert_includes player.owned_upgrade_keys, "maple_street_deck"
   end
+
+  test "a new run still logs tricks after buying an upgrade" do
+    post players_path, params: { player: { name: "PostShopRunner", avatar_color: "#445566" } }
+    player = Player.find_by!(name: "PostShopRunner")
+    player.update!(coins: 1_000)
+    trick = Trick.create!(name: "Store Kickflip", input_sequence: "up", base_xp: 10, base_coins: 3, difficulty: 1)
+
+    post shop_upgrade_purchase_path("maple_street_deck")
+    assert_redirected_to shop_path
+
+    post runs_path, headers: { "Accept" => "application/json" }
+    assert_response :created
+    run_id = JSON.parse(response.body)["id"]
+
+    post run_tricks_path, params: { run_id: run_id, trick_id: trick.id, input_used: "up" }, headers: { "Accept" => "application/json" }
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    assert_equal 3, body.dig("run", "coins_earned")
+    assert_equal 10, body.dig("run", "xp_earned")
+  end
 end

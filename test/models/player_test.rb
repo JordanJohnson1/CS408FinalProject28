@@ -41,4 +41,16 @@ class PlayerTest < ActiveSupport::TestCase
     assert_equal 115, rewards[:coins]
     assert_equal 105, rewards[:xp]
   end
+
+  test "upgrades without reward multipliers do not break reward calculation" do
+    player = Player.create!(name: "Combo Builder", coins: 600)
+    trick = Trick.new(name: "Window Flip", input_sequence: "space", base_xp: 100, base_coins: 100, difficulty: 1)
+
+    player.purchase_upgrade!("pro_trucks")
+
+    rewards = player.reward_for(trick, multiplier: 1.0)
+
+    assert_equal 100, rewards[:coins]
+    assert_equal 100, rewards[:xp]
+  end
 end
