@@ -47,6 +47,11 @@
             <li class="nav-item">
               <a class="nav-link <%= current_page?(leaderboard_path) ? "active" : "" %>" href="<%= leaderboard_path %>">Leaderboard</a>
             </li>
+            <% if current_player %>
+              <li class="nav-item">
+                <a class="nav-link <%= current_page?(player_path(current_player)) ? "active" : "" %>" href="<%= player_path(current_player) %>">Profile</a>
+              </li>
+            <% end %>
           </ul>
         </div>
       </div>

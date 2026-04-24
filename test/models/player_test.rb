@@ -53,4 +53,21 @@ class PlayerTest < ActiveSupport::TestCase
     assert_equal 100, rewards[:coins]
     assert_equal 100, rewards[:xp]
   end
+
+  test "reset_progress clears stats, upgrades, and runs" do
+    player = Player.create!(name: "Resettable", coins: 500, xp: 300, best_combo: 7, total_tricks: 12, total_coins_earned: 800)
+    player.update!(owned_upgrades: ["maple_street_deck"].to_json)
+    player.runs.create!(status: :finished, started_at: Time.current, ended_at: Time.current, coins_earned: 20, xp_earned: 10)
+
+    player.reset_progress!
+    player.reload
+
+    assert_equal 0, player.coins
+    assert_equal 0, player.xp
+    assert_equal 0, player.best_combo
+    assert_equal 0, player.total_tricks
+    assert_equal 0, player.total_coins_earned
+    assert_empty player.owned_upgrade_keys
+    assert_equal 0, player.runs.count
+  end
 end

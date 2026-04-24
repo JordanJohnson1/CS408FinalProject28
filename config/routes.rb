@@ -6,7 +6,9 @@ Rails.application.routes.draw do
   get "/leaderboard", to: "pages#leaderboard"
   post "/shop/upgrades/:key", to: "shop_upgrades#create", as: :shop_upgrade_purchase
 
-  resources :players, only: %i[new create show]
+  resources :players, only: %i[new create show destroy] do
+    patch :reset, on: :member
+  end
   resources :runs, only: %i[create update]
   resources :run_tricks, only: %i[create]
 

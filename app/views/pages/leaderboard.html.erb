@@ -7,8 +7,8 @@
         <p class="text-muted mb-0">Climb with bigger runs, tighter combos, and better idle gear.</p>
       </div>
       <div class="text-end">
-        <p class="text-muted small mb-1">Season reset</p>
-        <div class="fw-semibold">12d 6h left</div>
+        <p class="text-muted small mb-1">Tracked players</p>
+        <div class="fw-semibold"><%= Player.count %></div>
       </div>
     </div>
   </div>
@@ -34,7 +34,9 @@
                     <th scope="row">
                       <span class="badge bg-dark"><%= idx + 1 %></span>
                     </th>
-                    <td class="fw-semibold"><%= player.name %></td>
+                    <td class="fw-semibold">
+                      <a class="text-decoration-none text-dark" href="<%= player_path(player) %>"><%= player.name %></a>
+                    </td>
                     <td><%= number_with_delimiter(player.coins) %></td>
                     <td><%= player.best_combo %>x</td>
                     <td><%= player.total_tricks %></td>
@@ -54,18 +56,57 @@
             <span class="badge bg-skate-soft text-dark">Live</span>
           </div>
           <% if current_player %>
-            <div class="display-6 fw-bold">You</div>
+            <div class="display-6 fw-bold">#<%= @current_player_rank %></div>
             <p class="text-muted mb-2"><%= current_player.name %> • <%= number_with_delimiter(current_player.coins) %> coins • <%= current_player.best_combo %>x combo</p>
             <div class="d-flex gap-2 mb-3">
               <span class="pill"><span class="pill-dot bg-dark"></span> <%= current_player.total_tricks %> tricks</span>
               <span class="pill"><span class="pill-dot bg-warning"></span> <%= current_player.total_coins_earned %> coins earned</span>
             </div>
+            <a class="btn btn-outline-dark mt-1" href="<%= player_path(current_player) %>">Open profile</a>
           <% else %>
             <p class="text-muted">Create a player to see your live stats.</p>
           <% end %>
           <a class="btn btn-dark mt-3" href="<%= play_path %>">Push a new run</a>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="card border-0 card-shadow">
+    <div class="card-body p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <p class="eyebrow text-uppercase mb-2">Recent sessions</p>
+          <h5 class="fw-semibold mb-0">Latest finished runs</h5>
+        </div>
+      </div>
+
+      <% if @recent_runs.any? %>
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Player</th>
+                <th scope="col">Coins</th>
+                <th scope="col">XP</th>
+                <th scope="col">Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @recent_runs.each do |run| %>
+                <tr>
+                  <td><a class="text-decoration-none text-dark fw-semibold" href="<%= player_path(run.player) %>"><%= run.player.name %></a></td>
+                  <td><%= number_with_delimiter(run.coins_earned) %></td>
+                  <td><%= number_with_delimiter(run.xp_earned) %></td>
+                  <td><%= run.duration_ms.to_i / 1000 %>s</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-muted mb-0">No finished runs yet. Start skating to populate the board.</p>
+      <% end %>
     </div>
   </div>
 </div>

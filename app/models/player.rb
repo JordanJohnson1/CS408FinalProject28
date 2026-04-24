@@ -91,6 +91,20 @@ class Player < ApplicationRecord
     upgrade
   end
 
+  def reset_progress!
+    transaction do
+      runs.destroy_all
+      update!(
+        best_combo: 0,
+        coins: 0,
+        owned_upgrades: JSON.generate([]),
+        total_coins_earned: 0,
+        total_tricks: 0,
+        xp: 0
+      )
+    end
+  end
+
   def owned_upgrade_keys
     JSON.parse(owned_upgrades.presence || "[]")
   rescue JSON::ParserError
@@ -115,6 +129,10 @@ class Player < ApplicationRecord
 
   def combo_reset_ms
     3200 + purchased_upgrades.sum { |upgrade| upgrade.dig(:effect, :combo_reset_ms).to_i }
+  end
+
+  def self.leaderboard
+    order(coins: :desc, best_combo: :desc, total_tricks: :desc, created_at: :asc)
   end
 
   def upgrade_effect_decimal(upgrade, effect_key)
