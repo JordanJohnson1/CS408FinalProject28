@@ -1,29 +1,25 @@
-# Full-Stack Web Application
+# Stick Skater Project Summary
 
-This repository contains a full-stack web application built with Ruby on Rails,
-Bootstrap, and SQLite. It includes scripts and documentation for setting up,
-configuring, and running the application locally with automated testing using
-GitHub Actions.
-
-- [Development Guide](docs/README.md)
+Stick Skater is a Rails-based idle skating game with player profiles, trick combos, upgrade purchasing, and a leaderboard. The final checkpoint includes polished UI styling, expanded automated testing, and deployment automation for AWS EC2.
 
 ## Technology Stack
 
-- Backend technology stack
-    - Web Server: Built-in Rails server (Puma)
-    - Backend Runtime: Ruby
-    - Backend Framework: Ruby on Rails
-    - Database: SQLite for lightweight development and testing storage
-- Frontend technology stack
-    - Templates: ERB (Embedded Ruby) for server-side rendering
-    - UX/UI: Bootstrap 5 (CDN) for responsive design
-- Testing Frameworks
-    - Unit Testing: Minitest (Rails default testing framework)
-    - Continuous Integration: GitHub Actions (runs tests on every push)
- 
-## Team Workflow
+- Backend: Ruby on Rails 8.1 with Puma
+- Database: SQLite
+- Frontend: ERB, Bootstrap 5, Stimulus
+- Testing: Minitest integration and model tests
+- CI: GitHub Actions
+- Deployment: Docker and Kamal on EC2
 
-- Solo developer
-- All development is performed directly in the main repository
-- GitHub Actions automatically runs unit tests on every push to the main branch
-- Documentation is maintained in the `/docs` directory and updated throughout the semester
+## Final Checkpoint Deliverables
+
+- EC2 deployment scripts for host bootstrap and deploy execution
+- Parameterized Kamal configuration for reusable production deploys
+- Completed app styling across landing, gameplay, shop, leaderboard, and profile flows
+- Automated tests covering player creation, run lifecycle, upgrades, leaderboard behavior, and page access
+- Finalized README and deployment documentation
+
+## Supporting Docs
+
+- `README.md`
+- `docs/deployment.md`
