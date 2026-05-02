@@ -1,6 +1,30 @@
 # Stick Skater
 
-Stick Skater is a Ruby on Rails idle skating game where players create a skater, chain tricks together for combo rewards, buy permanent upgrades, and compete on a leaderboard.
+Stick Skater is a full-stack Ruby on Rails web application built around an idle skating game. Players create a skater, perform trick combinations, earn coins and XP, purchase permanent upgrades, and compete on a leaderboard. The project combines interactive frontend gameplay with persistent backend data so player progress, runs, upgrades, and rankings are all saved across sessions.
+
+## Project Overview
+
+The goal of the project was to build a game-style web application that demonstrates both frontend and backend development in a single Rails app. Stick Skater focuses on a simple but complete gameplay loop:
+
+1. Create a player.
+2. Start a skating run.
+3. Perform trick combos for rewards.
+4. Use earned coins to buy upgrades.
+5. Improve long-term stats and climb the leaderboard.
+
+The application includes gameplay logic, player progression, persistent data storage, automated testing, and deployment support.
+
+## Main Features
+
+- Player creation with custom skater name and avatar color
+- Real-time run session UI with trick input handling
+- Combo-based coin and XP rewards
+- Permanent shop upgrades that affect future runs
+- Leaderboard rankings based on player performance
+- Player profile pages with saved stats and recent run history
+- Persistent progress using a relational database
+- Automated test coverage for core gameplay and app flows
+- Deployment-ready configuration for EC2 using Kamal
 
 ## Stack
 
@@ -12,6 +36,20 @@ Stick Skater is a Ruby on Rails idle skating game where players create a skater,
 - Minitest
 - GitHub Actions CI
 - Kamal deployment to AWS EC2
+
+## App Structure
+
+Key parts of the application include:
+
+- `app/models/player.rb`: player stats, upgrades, rewards, and leaderboard logic
+- `app/models/run.rb`: run lifecycle and combo reward calculations
+- `app/models/trick.rb`: trick definitions and reward values
+- `app/controllers/runs_controller.rb`: starting and finishing runs
+- `app/controllers/run_tricks_controller.rb`: saving performed tricks during gameplay
+- `app/controllers/shop_upgrades_controller.rb`: shop purchases
+- `app/views/pages/*.html.erb`: landing, play, shop, and leaderboard pages
+- `app/javascript/controllers/*`: Stimulus controllers for live gameplay and canvas animation
+- `db/schema.rb`: database structure for players, runs, tricks, and run history
 
 ## Local Setup
 
@@ -30,6 +68,17 @@ You can also run `bin/setup --skip-server` to install dependencies, prepare the 
 4. Spend coins in `/shop` on permanent upgrades.
 5. Track progress on `/leaderboard` and each player profile.
 
+## Data Model
+
+The main database entities are:
+
+- `players`: stores user progress, stats, and owned upgrades
+- `runs`: stores each gameplay session
+- `tricks`: stores trick names, difficulty, and base rewards
+- `run_tricks`: stores the tricks performed within each run
+
+Together, these models support persistent progression and leaderboard tracking.
+
 ## Testing
 
 Run the full automated suite with:
@@ -44,6 +93,12 @@ The suite includes:
 - Integration tests for player creation, run lifecycle, shop purchases, leaderboard ordering, and page access
 
 GitHub Actions runs the same Rails test suite on every push and pull request to `main`.
+
+## Frontend and Backend Responsibilities
+
+Frontend responsibilities include rendering the main pages, handling trick key inputs, updating the live run interface, and drawing the skating animation on the canvas.
+
+Backend responsibilities include validating players, calculating rewards, persisting runs and run tricks, saving purchases, and ranking players on the leaderboard.
 
 ## Deployment
 
